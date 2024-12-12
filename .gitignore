@@ -1,0 +1,8 @@
+anonymp/data
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+tmp/
+res/
+*.swp
