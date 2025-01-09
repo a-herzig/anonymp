@@ -3,7 +3,7 @@
 install the required R packages
 
 ``` R
-install.packages(c("data.table", "dqrng", "tidyverse", "matrixStats"))
+install.packages(c("data.table", "dqrng", "tidyverse", "matrixStats", "R.utils"))
 ```
 
 download 1-User's dataset
