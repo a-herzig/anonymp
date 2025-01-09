@@ -14,6 +14,7 @@ cd anonymp/1-user/res
 curl -O https://lysine.univ-brest.fr/anonymp/data/chip.txt
 curl -O https://lysine.univ-brest.fr/anonymp/data/coordinates.I51.2_15.txt
 curl -O https://lysine.univ-brest.fr/anonymp/data/chr15_5popSim_4B11_Cases_FULL.vcf.gz
+cd ../../..
 ```
 
 download 2-Reference's dataset
@@ -22,6 +23,7 @@ download 2-Reference's dataset
 mkdir anonymp/2-reference/res
 cd anonymp/2-reference/res
 curl -O https://lysine.univ-brest.fr/anonymp/data/chr15_5popSim_4B11_Ref.vcf.gz
+cd ../../..
 ```
 
 run the automated pipeline on the 16 chunks
