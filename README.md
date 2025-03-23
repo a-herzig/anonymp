@@ -1,5 +1,11 @@
 # Anonymp
 
+install the parallel computation utilities pigz and GNU parallel
+
+``` bash
+apt install pigz parallel
+```
+
 install the required R packages
 
 ``` R
