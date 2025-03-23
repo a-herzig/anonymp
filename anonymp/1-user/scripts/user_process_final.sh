@@ -2,7 +2,7 @@
 # Eighth script of imputation process
 # decode imputation and compute score
 # must be executed from parent directory `/usr/bin/dash scripts/user_process_final.sh`
-CORES=16
+CORES="$1"
 
 cd inbox
 alias tarx='tar --extract --use-compress-program="pigz -3"'

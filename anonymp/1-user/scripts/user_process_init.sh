@@ -3,9 +3,9 @@
 # share an encoded genotype to compare server
 # share encode keys to reference server
 # must be executed from parent directory `/usr/bin/dash scripts/user_process_init.sh`
-CORES=16
-targets=$1
-chunks=$(gawk '{print $1}' res/coordinates.I51.2_15.txt)
+CORES="$1"
+targets="$2"
+chunks=$(gawk '{print $2}' res/coordinates.I51.2_15.txt)
 
 mkdir -p tmp outbox
 for target in $targets
