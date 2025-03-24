@@ -2,7 +2,7 @@
 # Sixth script of imputation process
 # must be executed from parent directory `/usr/bin/dash scripts/product_process.sh`
 
-CORES=16
+CORES="$1"
 
 mkdir -p outbox tmp
 

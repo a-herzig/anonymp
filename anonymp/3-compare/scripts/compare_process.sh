@@ -2,7 +2,7 @@
 # Third script of imputation process
 # share a comparison matrix to ppm server
 # must be executed from parent directory `/usr/bin/dash scripts/compare_process.sh`
-CORES=16
+CORES="$1"
 mkdir -p outbox
 
 cd inbox

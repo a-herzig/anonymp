@@ -3,7 +3,7 @@
 # share an encoded reference haplotype to compare server
 # must be executed from parent directory `/usr/bin/dash scripts/reference_process_init.sh`
 
-CORES=16
+CORES="$1"
 
 mkdir -p outbox tmp
 

@@ -8,14 +8,15 @@ then
   echo "pipeline require target index to impute"
   exit 2
 fi
-targets=$@
+cores="$1"
+targets="$2"
 
 step_total_duration_file="${prefix}duration_step_total.txt"
 
 runstep () {
   echo process $1
   start=$(date +%s.%N)
-  $2 "$3"
+  $2 $cores "$3"
   duration=$(echo "$(date +%s.%N) - $start" | bc)
   echo "$1 $duration" >> $step_total_duration_file
 }

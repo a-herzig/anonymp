@@ -4,6 +4,7 @@ start_time <- Sys.time()
 
 library(data.table)
 library(dqrng)
+suppressMessages(library(R.utils))
 
 POSITIONS_PATH <- "tmp/positions.txt"
 REFERENCE_PATH <- "res/chr15_5popSim_4B11_Ref.vcf.gz"

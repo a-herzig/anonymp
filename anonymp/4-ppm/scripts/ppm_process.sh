@@ -2,7 +2,7 @@
 # Fourth script of imputation process
 # compute ppm matrix and share it to imputation server
 # must be executed from parent directory `/usr/bin/dash scripts/ppm_process.sh`
-CORES=16
+CORES="$1"
 CHUNKS_PATH=inbox/1-user-4-ppm-chunks.txt
 mkdir -p tmp outbox
 

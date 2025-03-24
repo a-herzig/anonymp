@@ -6,6 +6,7 @@ start_time <- Sys.time()
 
 library(data.table)
 library(dqrng)
+suppressMessages(library(R.utils))
 
 CHUNKS_PATH <- "res/coordinates.I51.2_15.txt"
 TARGET_PATH <- "res/chr15_5popSim_4B11_Cases_FULL.vcf.gz"
