@@ -5,8 +5,9 @@
 # must be executed from parent directory `/usr/bin/dash scripts/user_process_init.sh`
 CORES="$1"
 targets="$2"
-chunks=$(gawk '{print $2}' res/coordinates.I51.2_15.txt)
+chunks=$(gawk '{print $1}' res/coordinates.I51.2_15.txt)
 
+rm --recursive tmp outbox
 mkdir -p tmp outbox
 for target in $targets
 do
