@@ -7,7 +7,6 @@ CORES="$1"
 targets="$2"
 chunks=$(gawk '{print $1}' res/coordinates.I51.2_15.txt)
 
-rm --recursive tmp outbox
 mkdir -p tmp outbox
 for target in $targets
 do
