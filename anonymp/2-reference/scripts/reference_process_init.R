@@ -42,41 +42,42 @@ nhaplotype <- ncol(reference_haplotypes)
 
 ## Encode reference
 
-genotype_length <- 0x1p10L
-haplotype_length <- 0x1p17L
+genotype_length <- 0x1p10L # around 800 visible snps, depends of the chunk
+haplotype_length <- 0x1p17L # 90_000 SNPs in the example
 
-# not reverted shuffle halotypes
+# not reversible shuffle halotypes
+# other operators don't see the haplotypes in the same order from a chunk to an other
 haplotype_shuffle_key <- dqsample.int(nhaplotype, replace = FALSE)
-reference_haplotypes_e4 <- reference_haplotypes[, haplotype_shuffle_key]
+reference_haplotypes_ishuffled <- reference_haplotypes[, haplotype_shuffle_key]
 remove(haplotype_shuffle_key)
 
 # filter visible snps
-reference_haplotypes_e3 <- reference_haplotypes_e4[fromuser$visible_snps, ]
+reference_haplotypes_visible_only <- reference_haplotypes_ishuffled[fromuser$visible_snps, ]
 
-# add fake snps
+# add fake snps, all chunks will have the same size
 # write only 0 in fake snps to don't favor some haplotypes at the cost of others because this could lead to non-optimal preselect choices
-reference_haplotypes_e9 <- matrix(0L, genotype_length, ncol(reference_haplotypes_e3))
-reference_haplotypes_e9[seq_along(fromuser$visible_snps), ] <- reference_haplotypes_e3
+reference_haplotypes_wfake_snps <- matrix(0L, genotype_length, nhaplotype)
+reference_haplotypes_wfake_snps[seq_along(fromuser$visible_snps), ] <- reference_haplotypes_visible_only
 
 # add fake haplotypes
-nfake_haplotype <- haplotype_length - ncol(reference_haplotypes)
 fake_haplotypes <- matrix(dqsample.int(2L, nfake_haplotype * genotype_length, replace = TRUE), genotype_length)
-reference_haplotypes_e6 <- cbind(reference_haplotypes_e9, fake_haplotypes)
+nfake_haplotype <- haplotype_length - nhaplotype
+reference_haplotypes_wwfake <- cbind(reference_haplotypes_wfake_snps, fake_haplotypes)
 
-# reverted shuffle haplotypes
+# reversible shuffle haplotypes, this key is shared to some operators
 haplotype_shuffle_key <- dqsample.int(haplotype_length, replace = FALSE)
-reference_haplotypes_e8 <- reference_haplotypes_e6[, haplotype_shuffle_key]
+reference_haplotypes_hshuffled <- reference_haplotypes_wwfake[, haplotype_shuffle_key]
 
-# encryption 1
+# shuffle SNPs using the key from 1-user
 stopifnot(length(fromuser$snp_shuffle_key) == genotype_length)
-stopifnot(nrow(reference_haplotypes_e8) == genotype_length)
-reference_haplotypes_e1 <- reference_haplotypes_e8[fromuser$snp_shuffle_key, ]
+stopifnot(nrow(reference_haplotypes_hshuffled) == genotype_length)
+stopifnot(ncol(reference_haplotypes_hshuffled) == haplotype_length)
+reference_haplotypes_snpshuffled <- reference_haplotypes_hshuffled[fromuser$snp_shuffle_key, ]
 
-# encryption 2
-reference_haplotypes_e2 <- sweep(reference_haplotypes_e1, 1L, fromuser$snp_noise_key, "+") %% 2L
-stopifnot(nrow(reference_haplotypes_e2) == genotype_length)
-stopifnot(ncol(reference_haplotypes_e2) == haplotype_length)
-
+# switch value on some SNPs, directed by snp_noise_key
+reference_haplotypes_switched <- sweep(reference_haplotypes_snpshuffled, 1L, fromuser$snp_noise_key, "+") %% 2L
+stopifnot(nrow(reference_haplotypes_switched) == genotype_length)
+stopifnot(ncol(reference_haplotypes_switched) == haplotype_length)
 ## Share data
 
 user_path <- paste("outbox/2-reference-1-user-chunk", chunk_name, ".Rdata", sep = "")
@@ -89,13 +90,13 @@ saveRDS(list(nhaplotype = nhaplotype), user_path)
 
 # keep reference_haplotypes_e4 for final step
 reference_file <- gzfile(reference_path, "wb", compression = 3L)
-writeBin(length(reference_haplotypes_e4), reference_file, size = 8L)
-writeBin(as.vector(reference_haplotypes_e4), reference_file, size = 1L)
+writeBin(length(reference_haplotypes_ishuffled), reference_file, size = 8L)
+writeBin(as.vector(reference_haplotypes_ishuffled), reference_file, size = 1L)
 close(reference_file)
 
 # share reference_haplotypes_e2 to compare server
 compare_file <- gzfile(compare_path, "wb", compression = 3L)
-writeBin(as.vector(reference_haplotypes_e2), compare_file, size = 1L)
+writeBin(as.vector(reference_haplotypes_switched), compare_file, size = 1L)
 close(compare_file)
 
 #
