@@ -36,7 +36,7 @@ dim(reference_haplotypes_e2) <- c(genotype_length, 0x1p17L)
 comparison_e1 <- 1 * sweep(reference_haplotypes_e2, 1L, genotype_e2, "==")
 
 # preselect haplotypes with the better "Same" score
-scores <- apply(comparison_e1, 2L, sum)
+scores <- colSums(comparison_e1)
 maximal_score <- sort(scores, decreasing = TRUE)[preselect_nhaplotype]
 preselect <- which(scores >= maximal_score)
 
