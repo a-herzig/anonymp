@@ -17,15 +17,18 @@ preselect_nhaplotype <- 512L
 user_path <- paste("inbox/1-user-3-compare-chunk", chunk_name, ".bin.gz", sep = "")
 reference_path <- paste("inbox/2-reference-3-compare-chunk", chunk_name, ".bin.gz", sep = "")
 
+genotype_length <- 0x1p10L
+
 # receive genotype_e2 from user
 user_file <- gzfile(user_path, "rb")
 genotype_e2 <- readBin(user_file, "integer", n = 0x1p10L, size = 1L, signed = FALSE)
 close(user_file)
+stopifnot(length(genotype_e2) == genotype_length)
 # receive reference_haplotypes_e2 from reference
 reference_file <- gzfile(reference_path, "rb")
 reference_haplotypes_e2 <- readBin(reference_file, "integer", n = 0x1p27L, size = 1L, signed = FALSE)
 close(reference_file)
-dim(reference_haplotypes_e2) <- c(0x1p10L, 0x1p17L)
+dim(reference_haplotypes_e2) <- c(genotype_length, 0x1p17L)
 
 ## Encode genotype
 

@@ -89,6 +89,7 @@ genotype_e1 <- genotype_e3[snp_shuffle_key]
 # encryption 2
 snp_noise_key <- dqsample.int(2L, genotype_length, replace = TRUE)
 genotype_e2 <- (genotype_e1 + snp_noise_key) %% 2L
+stopifnot(length(genotype_e2) == genotype_length)
 
 ## Share data
 
