@@ -50,6 +50,8 @@ haplotype_length <- 0x1p17L # 90_000 SNPs in the example
 haplotype_shuffle_key <- dqsample.int(nhaplotype, replace = FALSE)
 reference_haplotypes_ishuffled <- reference_haplotypes[, haplotype_shuffle_key]
 remove(haplotype_shuffle_key)
+stopifnot(nrow(reference_haplotypes_ishuffled) == nsnp)
+stopifnot(ncol(reference_haplotypes_ishuffled) == nhaplotype)
 
 # filter visible snps
 reference_haplotypes_visible_only <- reference_haplotypes_ishuffled[fromuser$visible_snps, ]
@@ -60,8 +62,8 @@ reference_haplotypes_wfake_snps <- matrix(0L, genotype_length, nhaplotype)
 reference_haplotypes_wfake_snps[seq_along(fromuser$visible_snps), ] <- reference_haplotypes_visible_only
 
 # add fake haplotypes
-fake_haplotypes <- matrix(dqsample.int(2L, nfake_haplotype * genotype_length, replace = TRUE), genotype_length)
 nfake_haplotype <- haplotype_length - nhaplotype
+fake_haplotypes <- matrix(dqsample.int(2L, nfake_haplotype * genotype_length, replace = TRUE), genotype_length)
 reference_haplotypes_wwfake <- cbind(reference_haplotypes_wfake_snps, fake_haplotypes)
 
 # reversible shuffle haplotypes, this key is shared to some operators
@@ -78,6 +80,25 @@ reference_haplotypes_snpshuffled <- reference_haplotypes_hshuffled[fromuser$snp_
 reference_haplotypes_switched <- sweep(reference_haplotypes_snpshuffled, 1L, fromuser$snp_noise_key, "+") %% 2L
 stopifnot(nrow(reference_haplotypes_switched) == genotype_length)
 stopifnot(ncol(reference_haplotypes_switched) == haplotype_length)
+
+# 24/05/2025 : create fake values to hide sensitive information to 1-user and 5-product
+# they are mixed with the main flow of data by 4-ppm and 2-reference-final
+# completely fake reference panel matrix, = refF
+fake_reference <- matrix(dqsample(c(0L, 1L), nsnp * 0x1p10L, replace = TRUE), nrow = nsnp, ncol = 0x1p10L)
+# completely fake ppm matrix, = ppmF
+# there is no interpolation emulation in this implementation
+fake_ppm_matrix <- matrix(dqrunif(nsnp * 0x1p10L, 0.01, 1), nrow = nsnp, ncol = 0x1p10L)
+# normalize row sums
+fake_ppm_matrix <- fake_ppm_matrix / rowSums(fake_ppm_matrix)
+# the effect on final result, = dF
+fake_dosage <- rowSums(fake_ppm_matrix * fake_reference)
+stopifnot(length(fake_dosage) == nsnp)
+# integrate fake ppm matrix to the real one
+reference_haplotypes_w2fake <- cbind(reference_haplotypes_ishuffled, fake_reference)
+stopifnot(nrow(reference_haplotypes_w2fake) == nsnp)
+stopifnot(ncol(reference_haplotypes_w2fake) == nhaplotype + 0x1p10L)
+stopifnot(length(reference_haplotypes_w2fake) == nsnp * (nhaplotype + 0x1p10L))
+
 ## Share data
 
 user_path <- paste("outbox/2-reference-1-user-chunk", chunk_name, ".Rdata", sep = "")
@@ -89,10 +110,10 @@ ppm_path <- paste("outbox/2-reference-4-ppm-chunk", chunk_name, ".Rdata", sep = 
 saveRDS(list(nhaplotype = nhaplotype), user_path)
 
 # keep reference_haplotypes_e4 for final step
-reference_file <- gzfile(reference_path, "wb", compression = 3L)
-writeBin(length(reference_haplotypes_ishuffled), reference_file, size = 8L)
-writeBin(as.vector(reference_haplotypes_ishuffled), reference_file, size = 1L)
-close(reference_file)
+saveRDS(list(
+	reference_haplotypes = reference_haplotypes_w2fake,
+	fake_dosage = fake_dosage
+), reference_path)
 
 # share reference_haplotypes_e2 to compare server
 compare_file <- gzfile(compare_path, "wb", compression = 3L)
@@ -100,7 +121,7 @@ writeBin(as.vector(reference_haplotypes_switched), compare_file, size = 1L)
 close(compare_file)
 
 #
-saveRDS(list(haplotype_shuffle_key = unname(haplotype_shuffle_key), nhaplotype = nhaplotype), ppm_path)
+saveRDS(list(haplotype_shuffle_key = unname(haplotype_shuffle_key), nhaplotype = nhaplotype, fake_ppm_matrix = fake_ppm_matrix), ppm_path)
 
 duration <- difftime(Sys.time(), start_time, units = "secs")
 duration_line <- paste("reference_init", chunk_name, duration, sep = ",")

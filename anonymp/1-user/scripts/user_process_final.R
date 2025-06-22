@@ -27,7 +27,9 @@ fromppm <- readRDS(ppm_path)
 fromproduct <- readRDS(product_path)
 remove(user_path, reference_path, ppm_path, product_path)
 
-nhaplotype <- fromreference$nhaplotype
+# nhaplotype <- fromreference$nhaplotype
+dosage <- fromreference$dosage
+
 # The bellow variables are all relative to the chunk
 nsnp <- fromuser$nsnp
 minrange <- fromuser$minrange
@@ -39,26 +41,33 @@ genotype <- fromuser$genotype
 target_index <- fromuser$target_index
 chunk_index <- fromuser$chunk_index
 total_start_time <- fromuser$total_start_time
-# TODO : Why is PPM to give preselect ?
-preselect <- fromppm$preselect
-ppm_shuffle_key_order <- fromppm$ppm_shuffle_key
-ppm_select_pos <- fromppm$ppm_select_pos
+
+# ppm_shuffle_key_order <- fromppm$ppm_shuffle_key
+# ppm_select_pos <- fromppm$ppm_select_pos
+full_shuffle_key_order <- fromppm$full_shuffle_key_order
+
 # receive imputation_e5 from imputation product server
 imputation_e5 <- fromproduct$imputation_e5
+
 remove(fromuser, fromreference, fromppm, fromproduct)
 
 ## Decode imputation
 
+if (FALSE) {
 # remove ppm_shuffle_key shuffle on imputation
 imputation_select <- imputation_e5[ppm_shuffle_key_order]
 # build a large imputation matrix on all SNPs and all haplotypes
 imputation_matrix <- vector("integer", nsnp * nhaplotype)
 imputation_matrix[ppm_select_pos] <- imputation_select
 dim(imputation_matrix) <- c(nsnp, nhaplotype)
+}
 
 # sum SNPs probabilities
-imputation <- rowSums(imputation_matrix)
-remove(imputation_select, imputation_matrix)
+stopifnot(length(imputation_e5) %% nsnp == 0)
+nhaplotype_wfake <- length(imputation_e5) %/% nsnp
+stopifnot(length(dosage) == nsnp)
+imputation <- rowSums(matrix(imputation_e5[full_shuffle_key_order], nrow = nsnp, ncol = nhaplotype_wfake)) - dosage
+# remove(imputation_select, imputation_matrix)
 
 # which snps are included ? i.e. reported in the target
 included_snps <- which(minrange <= positions & positions <= maxrange)

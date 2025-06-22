@@ -35,6 +35,7 @@ reference_path <- paste("inbox/2-reference-4-ppm-chunk", chunk_name, ".Rdata", s
 fromreference <- readRDS(reference_path)
 haplotype_shuffle_key <- fromreference$haplotype_shuffle_key
 nhaplotype <- fromreference$nhaplotype
+fake_ppm_matrix <- fromreference$fake_ppm_matrix
 
 # read comparison table
 compare_path <- paste("inbox/3-compare-4-ppm-chunk", chunk_name, ".Rdata", sep = "")
@@ -163,14 +164,20 @@ interpolated_logppm <- na.fail(interpolate_ppm(raw_logppm, visible_snps, nsnp))
 stopifnot(nrow(interpolated_logppm) == nsnp)
 stopifnot(ncol(interpolated_logppm) == length(preselect))
 
-# replace floating values by integer
-# this should use less memory and product should be faster
-# we could use uint8
 # position vector has to point out of preselect referential
 # because the reference_haplotype matrix of the product will
 # not be filtered in preselect
-integer_ppm <- matrix(0L, nrow = nsnp, ncol = nhaplotype)
-integer_ppm[, preselect] <- as.integer(exp(interpolated_logppm) * 2L^16L)
+standard_ppm <- matrix(0L, nrow = nsnp, ncol = nhaplotype)
+standard_ppm[, preselect] <- exp(interpolated_logppm)
+
+# 24/05/2025 : integrate fake PPM from 2-reference
+stopifnot(nrow(fake_ppm_matrix) == nsnp)
+stopifnot(ncol(fake_ppm_matrix) == 0x1p10L)
+ppm_wfake <- cbind(standard_ppm, fake_ppm_matrix)
+stopifnot(nrow(ppm_wfake) == nsnp)
+stopifnot(ncol(ppm_wfake) == nhaplotype + 0x1p10L)
+chunk_size <- length(ppm_wfake)
+if (FALSE) { # multi-line comment on optimisations to upgrade the program easily
 
 # filter the ppm to remove negligible probabilities
 # ppm is now represented with a pair of vectors (value, position)
@@ -196,6 +203,7 @@ ppm_wfake_pos <- c(ppm_select_pos, fake_ppm_pos)
 stopifnot(length(ppm_wfake) == length(ppm_wfake_pos))
 stopifnot(length(ppm_wfake) == schunk_size)
 stopifnot(max(ppm_wfake_pos) <= chunk_size)
+}
 
 # read a 32 bit signed integer to use it as a seed
 seed_path <- paste("tmp/rand-chunk", chunk_name, ".txt", sep = "")
@@ -205,25 +213,41 @@ remove(seed_path)
 
 # encryption 5
 # move positions of vectors
+# create a second key reproducible using seed shared to 2-Reference, = ro in Anthony's script
 full_shuffle_key <- dqsample.int(chunk_size, replace = FALSE)
+dqset.seed(seed = NULL) # the following random operations are not seed-predicted
 # update position vector
-ppm_wfake_pos_shuffled <- order(full_shuffle_key)[ppm_wfake_pos]
+ppm_wfake_shuffled <- c(ppm_wfake)[full_shuffle_key]
+
+nhaplotype_wfake <- nhaplotype + 0x1p10L
+stopifnot(length(ppm_wfake_shuffled) == nsnp * nhaplotype_wfake)
+ppm_shared <- ppm_wfake_shuffled
 
 # shuffle PPM vectors
+if (FALSE) {
 ppm_shuffle_key <- dqsample.int(schunk_size, replace = FALSE)
 ppm_shared <- ppm_wfake[ppm_shuffle_key]
 ppm_shared_pos <- ppm_wfake_pos_shuffled[ppm_shuffle_key]
+}
 
+# 24/05/2025 : in row shuffle
+# = o1
+full_shuffle_key_order <- order(full_shuffle_key)
+# this is not reverted in 1-User final script, but has no consequence on the final result because the sum in rowSums operation is commutative, = o2 in Anthony's script
+full_shuffle_key_order_w_row_shuffle <- c(t(apply(matrix(full_shuffle_key_order, nrow = nsnp, ncol = nhaplotype_wfake), 1, sample, nhaplotype_wfake, FALSE)))
 ## Share data
 user_path <- paste("outbox/4-ppm-1-user-chunk", chunk_name, ".Rdata", sep = "")
 product_path <- paste("outbox/4-ppm-5-product-chunk", chunk_name, ".Rdata", sep = "")
 
 # share preselect to user
-stopifnot(length(integer_ppm) == nhaplotype * nsnp)
-saveRDS(list(preselect = preselect, ppm_shuffle_key = order(ppm_shuffle_key)[seq_along(ppm_select)], ppm_select_pos = ppm_select_pos), user_path)
+stopifnot(is.vector(full_shuffle_key_order_w_row_shuffle))
+stopifnot(length(full_shuffle_key_order_w_row_shuffle) == chunk_size)
+saveRDS(list(full_shuffle_key_order = full_shuffle_key_order_w_row_shuffle), user_path)
 # user and reference will receive seed to compute full_shuffle_key
 # share interpolated_ppm_e5 to imputation product server
-saveRDS(list(ppm_shared = ppm_shared, ppm_shared_pos = ppm_shared_pos), product_path)
+stopifnot(is.vector(ppm_shared))
+stopifnot(length(ppm_shared) == chunk_size)
+saveRDS(list(ppm = ppm_shared), product_path)
 # write ppm in uint8 binary format
 # reader needs to know the size before reading, it will be constant
 
