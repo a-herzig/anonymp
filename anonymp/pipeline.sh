@@ -51,17 +51,17 @@ cd $basedir/$ACTOR
 runstep ppm ./scripts/ppm_process.sh
 dispatch $ACTOR "1-user 2-reference 5-product"
 
-ACTOR=2-reference
+ACTOR="2-reference"
 cd $basedir/$ACTOR
 runstep reference_final ./scripts/reference_process_final.sh
-dispatch $ACTOR "5-product"
+dispatch $ACTOR "1-user 5-product"
 
-ACTOR=5-product
+ACTOR="5-product"
 cd $basedir/$ACTOR
 runstep product ./scripts/product_process.sh
 dispatch $ACTOR "1-user"
 
-ACTOR=1-user
+ACTOR="1-user"
 cd $basedir/$ACTOR
 runstep user_final ./scripts/user_process_final.sh
 
