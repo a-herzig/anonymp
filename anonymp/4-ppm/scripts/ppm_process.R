@@ -174,8 +174,9 @@ standard_ppm[, preselect] <- exp(interpolated_logppm)
 stopifnot(nrow(fake_ppm_matrix) == nsnp)
 stopifnot(ncol(fake_ppm_matrix) == 0x1p10L)
 ppm_wfake <- cbind(standard_ppm, fake_ppm_matrix)
+ppm_wfake <- standard_ppm # DEBUG do not add fake ppm matrix
 stopifnot(nrow(ppm_wfake) == nsnp)
-stopifnot(ncol(ppm_wfake) == nhaplotype + 0x1p10L)
+# stopifnot(ncol(ppm_wfake) == nhaplotype + 0x1p10L) DEBUG fake ppm matrix is not included
 chunk_size <- length(ppm_wfake)
 if (FALSE) { # multi-line comment on optimisations to upgrade the program easily
 
@@ -220,6 +221,7 @@ dqset.seed(seed = NULL) # the following random operations are not seed-predicted
 ppm_wfake_shuffled <- c(ppm_wfake)[full_shuffle_key]
 
 nhaplotype_wfake <- nhaplotype + 0x1p10L
+nhaplotype_wfake <- nhaplotype # DEBUG keep number of haplotypes without the fake ones
 stopifnot(length(ppm_wfake_shuffled) == nsnp * nhaplotype_wfake)
 ppm_shared <- ppm_wfake_shuffled
 
@@ -235,6 +237,7 @@ ppm_shared_pos <- ppm_wfake_pos_shuffled[ppm_shuffle_key]
 full_shuffle_key_order <- order(full_shuffle_key)
 # this is not reverted in 1-User final script, but has no consequence on the final result because the sum in rowSums operation is commutative, = o2 in Anthony's script
 full_shuffle_key_order_w_row_shuffle <- c(t(apply(matrix(full_shuffle_key_order, nrow = nsnp, ncol = nhaplotype_wfake), 1, sample, nhaplotype_wfake, FALSE)))
+full_shuffle_key_order_w_row_shuffle <- full_shuffle_key_order # DEBUG do not use the shuffled order in rows
 ## Share data
 user_path <- paste("outbox/4-ppm-1-user-chunk", chunk_name, ".Rdata", sep = "")
 product_path <- paste("outbox/4-ppm-5-product-chunk", chunk_name, ".Rdata", sep = "")

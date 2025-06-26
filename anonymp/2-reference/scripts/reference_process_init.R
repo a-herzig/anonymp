@@ -111,7 +111,8 @@ saveRDS(list(nhaplotype = nhaplotype), user_path)
 
 # keep reference_haplotypes_e4 for final step
 saveRDS(list(
-	reference_haplotypes = reference_haplotypes_w2fake,
+	# reference_haplotypes = reference_haplotypes_w2fake, # DEBUG do not send the reference haplotypes with fake values
+	reference_haplotypes = reference_haplotypes_ishuffled, # DEBUG send the reference haplotypes without the fake values instead
 	fake_dosage = fake_dosage
 ), reference_path)
 
