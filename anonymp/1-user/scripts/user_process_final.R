@@ -81,7 +81,7 @@ imputation <- imputation[included_snps]
 included_nsnp <- length(included_snps)
 included_visible_snps <- match(visible_snps, included_snps)
 included_visible_snps <- included_visible_snps[!is.na(included_visible_snps)]
-result <- 1 * ((imputation >= 2L^15L) == target[included_snps])
+result <- 1 * ((imputation >= 0.5) == target[included_snps])
 result[included_visible_snps] <- 0L
 is_unknown <- array(1, included_nsnp)
 is_unknown[included_visible_snps] <- 0L
