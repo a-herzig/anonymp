@@ -38,7 +38,6 @@ dqset.seed(NULL)
 # 24/05/2025 : new noise idea from Anthony's script, = B1 in Anthony's script
 # this is reverted in 1-User but the ppm interpolation is more difficult to re-order, = B1
 ppm_noise <- dqrunif(chunk_size, min = 0.01, max = 1)
-ppm_noise <- rep.int(0, chunk_size) # DEBUG : remove noise on imputation value
 stopifnot(length(ppm_noise) == chunk_size)
 # 24/05/2025 : in row shuffle
 # = o1
@@ -47,7 +46,6 @@ full_shuffle_key_order <- order(full_shuffle_key)
 # final fictive dosage, = dF2
 fake_dosage_adjusted <- fake_dosage + rowSums(matrix(ppm_noise[full_shuffle_key_order], nrow = nsnp, ncol = nhaplotype_wfake))
 stopifnot(length(fake_dosage_adjusted) == nsnp)
-fake_dosage_adjusted <- rep.int(0, nsnp) # DEBUG : there is no dosage effect because no fake values and no noise
 
 # encryption 5
 reference_haplotypes_e5 <- c(reference_haplotypes_e4)[full_shuffle_key]
