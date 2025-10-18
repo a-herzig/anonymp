@@ -23,7 +23,6 @@ reference_path <- paste("inbox/2-reference-5-product-chunk", chunk_name, ".Rdata
 # receive ppm and positions from PPM server
 fromppm <- readRDS(ppm_path)
 ppm <- fromppm$ppm
-# ppm <- readBin(ppm_path, "integer", n = chunk_size, size = 2, signed = FALSE)
 # receive reference_haplotypes_e5 from GDI
 fromreference <- readRDS(reference_path)
 reference <- fromreference$reference_haplotypes

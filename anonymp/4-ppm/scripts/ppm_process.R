@@ -149,10 +149,6 @@ comparison <- comparison_e8[order(snp_shuffle_key)[seq_along(visible_snps)], ]
 
 # which are the preselect haplotypes
 preselect <- which(order(haplotype_shuffle_key) %in% preselect_e9)
-# check no fake haplotype has been selected by 3-compare
-# if it happens, restart the imputation on this chunk later
-# if we permit that to happen, final result is inconstant; remove fake haplotypes, they are at the end
-# comparison <- comparison[, preselect <= nhaplotype]
 stopifnot(max(preselect) <= nhaplotype)
 
 # compute raw ppm
@@ -177,33 +173,6 @@ ppm_wfake <- cbind(standard_ppm, fake_ppm_matrix)
 stopifnot(nrow(ppm_wfake) == nsnp)
 stopifnot(ncol(ppm_wfake) == nhaplotype + 0x1p10L)
 chunk_size <- length(ppm_wfake)
-if (FALSE) { # multi-line comment on optimisations to upgrade the program easily
-
-# filter the ppm to remove negligible probabilities
-# ppm is now represented with a pair of vectors (value, position)
-ppm_select <- integer_ppm[integer_ppm >= 1L]
-ppm_select_pos <- which(integer_ppm >= 1L)
-stopifnot(length(ppm_select) == length(ppm_select_pos))
-
-# add fake probas to have all chunks of the same size
-chunk_size <- 2L^29L
-schunk_size <- 2L^21L
-cat("prepopulation chunk size : 2 ^", log(length(integer_ppm)) / log(2L), "\n")
-stopifnot(length(integer_ppm) <= chunk_size)
-cat("prepopulation chunk size nonnull : 2 ^", log(length(ppm_select)) / log(2L), "\n")
-stopifnot(length(ppm_select) <= schunk_size)
-
-nfake <- schunk_size - length(ppm_select)
-fake_ppm <- dqsample.int(2L^16L, nfake, replace = TRUE)
-fake_ppm_pos <- dqsample(setdiff(seq_len(chunk_size), ppm_select_pos), nfake, replace = FALSE)
-stopifnot(length(fake_ppm) == nfake)
-stopifnot(length(fake_ppm_pos) == nfake)
-ppm_wfake <- c(ppm_select, fake_ppm)
-ppm_wfake_pos <- c(ppm_select_pos, fake_ppm_pos)
-stopifnot(length(ppm_wfake) == length(ppm_wfake_pos))
-stopifnot(length(ppm_wfake) == schunk_size)
-stopifnot(max(ppm_wfake_pos) <= chunk_size)
-}
 
 # read a 32 bit signed integer to use it as a seed
 seed_path <- paste("tmp/rand-chunk", chunk_name, ".txt", sep = "")
@@ -222,13 +191,6 @@ ppm_wfake_shuffled <- c(ppm_wfake)[full_shuffle_key]
 nhaplotype_wfake <- nhaplotype + 0x1p10L
 stopifnot(length(ppm_wfake_shuffled) == nsnp * nhaplotype_wfake)
 ppm_shared <- ppm_wfake_shuffled
-
-# shuffle PPM vectors
-if (FALSE) {
-ppm_shuffle_key <- dqsample.int(schunk_size, replace = FALSE)
-ppm_shared <- ppm_wfake[ppm_shuffle_key]
-ppm_shared_pos <- ppm_wfake_pos_shuffled[ppm_shuffle_key]
-}
 
 # 24/05/2025 : in row shuffle
 # = o1
