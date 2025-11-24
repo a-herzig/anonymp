@@ -23,7 +23,7 @@ summation_path <- paste("inbox/6-summation-1-user-chunk", chunk_name, ".Rdata", 
 fromuser <- readRDS(user_path)
 fromreference <- readRDS(reference_path)
 fromsummation <- readRDS(summation_path)
-remove(user_path, reference_path, product_path)
+remove(user_path, reference_path, summation_path)
 
 # nhaplotype <- fromreference$nhaplotype
 dosage <- fromreference$dosage
@@ -42,7 +42,7 @@ total_start_time <- fromuser$total_start_time
 
 
 # receive imputation_e5 from imputation product server
-imputation <- fromsummation$imputation
+imputation <- fromsummation[[1]]
 
 remove(fromuser, fromreference, fromsummation)
 

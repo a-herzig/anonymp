@@ -37,7 +37,7 @@ if [ "$SecureSummation" = "SecureSummation" ]; then
 ACTOR="1-user"
 cd $basedir/$ACTOR
 runstep user_init ./scripts/user_process_init_SS.sh "$targets"
-dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm 5-product"
+dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm 5-product 6-summation"
 
 ACTOR="2-reference"
 cd $basedir/$ACTOR
@@ -52,12 +52,12 @@ dispatch $ACTOR "4-ppm"
 ACTOR="4-ppm"
 cd $basedir/$ACTOR
 runstep ppm ./scripts/ppm_process_SS.sh
-dispatch $ACTOR "1-user 2-reference 5-product"
+dispatch $ACTOR "6-summation 2-reference 5-product"
 
 ACTOR="2-reference"
 cd $basedir/$ACTOR
-runstep reference_final ./scripts/reference_process_final_SS.sh
-dispatch $ACTOR "5-product 6-summation"
+runstep reference_final ./scripts/reference_process_final.sh
+dispatch $ACTOR "1-user 5-product"
 
 ACTOR="5-product"
 cd $basedir/$ACTOR

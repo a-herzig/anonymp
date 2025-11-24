@@ -39,9 +39,9 @@ stopifnot(length(reference) == length(ppm))
 imputation <- reference * ppm + ppm_noise
 
 ## Share data imputation_e5 to user
-user_path <- paste("outbox/5-product-6-summation-chunk", chunk_name, ".Rdata", sep = "")
+summation_path <- paste("outbox/5-product-6-summation-chunk", chunk_name, ".Rdata", sep = "")
 # user_path <- paste("outbox/5-product-1-user-chunk", chunk_name, ".bin", sep = "")
-saveRDS(list(imputation_e5 = imputation), user_path)
+saveRDS(list(imputation_e5 = imputation), summation_path)
 # writeBin(imputation_e5, user_path, size = 2)
 
 duration <- difftime(Sys.time(), start_time, units = "secs")

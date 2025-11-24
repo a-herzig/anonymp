@@ -177,7 +177,7 @@ chunk_size <- length(ppm_wfake)
 # read a 32 bit signed integer to use it as a seed
 seed_path <- paste("tmp/rand-chunk", chunk_name, ".txt", sep = "")
 # set.seed only accepts 32 bit signed integers (from -2 ^ 31 + 1 to 2 ^ 31 - 1)
-dqset.seed(as.integer(readLines(seed_path)))
+dqset.seed(as.integer(readLines(seed_path)))##this seems to give NA ?
 remove(seed_path)
 
 # encryption 5

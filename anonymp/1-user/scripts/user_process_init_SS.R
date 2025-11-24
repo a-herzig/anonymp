@@ -113,9 +113,7 @@ datatouser <- list(
 )
 saveRDS(datatouser, file = user_path)
 
-datatosummation <- list(
-  nsnp = nsnp,
-)
+datatosummation <- list(nsnp = nsnp)
 saveRDS(datatosummation, file = summation_path)
 
 # share visible_snps & snp_shuffle_key & snp_noise_key to GDI
