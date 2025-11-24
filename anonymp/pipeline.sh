@@ -32,7 +32,7 @@ dispatch () {
 
 ./scripts/clean.sh
 
-if [ "$SecureSummation" = "true" ]; then
+if [ "$SecureSummation" = "SecureSummation" ]; then
 
 ACTOR="1-user"
 cd $basedir/$ACTOR
