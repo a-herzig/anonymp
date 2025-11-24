@@ -26,7 +26,8 @@ tarx -f pack-3-compare-4-ppm.tar.gz
 cd ..
 for chunk_name in $(cat $CHUNKS_PATH)
 do
-  echo "$(rand_int32)\n$(rand_int32)" > tmp/rand-chunk${chunk_name}.txt
+  echo "$(rand_int32)" > tmp/rand-chunk${chunk_name}.txt
+  echo "$(rand_int32)" >> tmp/rand-chunk${chunk_name}.txt
   # share seed to compute full_shuffle_key to 2-reference
   cp tmp/rand-chunk${chunk_name}.txt outbox/4-ppm-2-reference-rand-chunk${chunk_name}.txt
 done
