@@ -10,6 +10,7 @@ then
 fi
 cores="$1"
 targets="$2"
+SecureSummation="$3"
 
 step_total_duration_file="${prefix}duration_step_total.txt"
 
@@ -51,6 +52,29 @@ cd $basedir/$ACTOR
 runstep ppm ./scripts/ppm_process.sh
 dispatch $ACTOR "1-user 2-reference 5-product"
 
+if [ "$SecureSummation" = "true" ]; then
+
+ACTOR="2-reference"
+cd $basedir/$ACTOR
+runstep reference_final ./scripts/reference_process_final_SS.sh
+dispatch $ACTOR "1-user 5-product 6-summation"
+
+ACTOR="5-product"
+cd $basedir/$ACTOR
+runstep product ./scripts/product_process_SS.sh
+dispatch $ACTOR "6-summation"
+
+ACTOR="6-summation"
+cd $basedir/$ACTOR
+runstep product ./scripts/summation_process.sh
+dispatch $ACTOR "1-user"
+
+ACTOR="1-user"
+cd $basedir/$ACTOR
+runstep user_final ./scripts/user_process_final_SS.sh
+
+else 
+
 ACTOR="2-reference"
 cd $basedir/$ACTOR
 runstep reference_final ./scripts/reference_process_final.sh
@@ -64,6 +88,8 @@ dispatch $ACTOR "1-user"
 ACTOR="1-user"
 cd $basedir/$ACTOR
 runstep user_final ./scripts/user_process_final.sh
+
+fi
 
 cd $basedir
 duration_stats_file="${prefix}duration_stats.txt"
