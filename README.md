@@ -32,7 +32,7 @@ curl -O https://lysine.univ-brest.fr/anonymp/data/chr15_5popSim_4B11_Ref.vcf.gz
 cd ../../..
 ```
 
-run the automated pipeline on the 16 chunks using 8 CPUs
+run the automated pipeline on the first 16 individuals using 8 CPUs
 
 ``` bash
 cd anonymp
