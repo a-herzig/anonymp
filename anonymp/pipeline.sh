@@ -66,7 +66,7 @@ dispatch $ACTOR "6-summation"
 
 ACTOR="6-summation"
 cd $basedir/$ACTOR
-runstep product ./scripts/summation_process.sh
+runstep summation ./scripts/summation_process.sh
 dispatch $ACTOR "1-user"
 
 ACTOR="1-user"
