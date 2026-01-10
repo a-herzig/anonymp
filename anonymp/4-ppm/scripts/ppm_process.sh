@@ -27,5 +27,4 @@ done
 
 parallel --max-procs $CORES Rscript scripts/ppm_process.R :::: $CHUNKS_PATH
 
-cd outbox
-touch 4-ppm-*
+touch outbox/4-ppm-*

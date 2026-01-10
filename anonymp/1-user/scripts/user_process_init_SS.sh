@@ -36,5 +36,4 @@ fi
 
 parallel --max-procs $CORES --colsep ' ' Rscript scripts/user_process_init_SS.R :::: tmp/chunks.txt
 
-cd outbox
-touch 1-user-*
+touch outbox/1-user-*

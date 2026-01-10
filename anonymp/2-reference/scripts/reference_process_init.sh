@@ -14,5 +14,4 @@ zcat res/chr15_5popSim_4B11_Ref.vcf.gz \
 echo process reference haplotypes
 parallel --max-procs $CORES Rscript scripts/reference_process_init.R :::: inbox/1-user-2-reference-chunks.txt
 
-cd outbox
-touch 2-reference-*
+touch outbox/2-reference-*

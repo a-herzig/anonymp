@@ -9,5 +9,4 @@ mkdir -p outbox tmp
 echo process imputation product
 parallel --max-procs $CORES Rscript scripts/product_process.R :::: inbox/1-user-5-product-chunks.txt
 
-cd outbox
-touch 5-product-*
+touch outbox/5-product-*

@@ -8,5 +8,4 @@ mkdir -p tmp outbox
 
 parallel --max-procs $CORES Rscript scripts/summation_process.R :::: inbox/1-user-6-summation-chunks.txt
 
-cd outbox
-touch 6-summation-*
+touch outbox/6-summation-*

@@ -7,5 +7,4 @@ mkdir -p outbox
 
 parallel --max-procs $CORES Rscript scripts/compare_process.R :::: inbox/1-user-3-compare-chunks.txt
 
-cd outbox
-touch 3-compare-*
+touch outbox/3-compare-*
