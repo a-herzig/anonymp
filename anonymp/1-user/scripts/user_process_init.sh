@@ -35,12 +35,5 @@ fi
 
 parallel --max-procs $CORES --colsep ' ' Rscript scripts/user_process_init.R :::: tmp/chunks.txt
 
-
 cd outbox
 touch 1-user-*
-alias tarc='tar --create --use-compress-program="pigz -3" --remove-files'
-tarc -f pack-1-user-2-reference.tar.gz 1-user-2-reference-*
-tarc -f pack-1-user-3-compare.tar.gz 1-user-3-compare-*
-tarc -f pack-1-user-4-ppm.tar.gz 1-user-4-ppm-*
-tarc -f pack-1-user-5-product.tar.gz 1-user-5-product-*
-tarc -f pack-1-user-1-user.tar.gz 1-user-1-user-*

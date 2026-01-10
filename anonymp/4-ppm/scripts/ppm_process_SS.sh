@@ -17,13 +17,6 @@ rand_int32() {
   echo $output
 }
 
-cd inbox
-alias tarx='tar --extract --use-compress-program="pigz -3"'
-tarx -f pack-1-user-4-ppm.tar.gz
-tarx -f pack-2-reference-4-ppm.tar.gz
-tarx -f pack-3-compare-4-ppm.tar.gz
-
-cd ..
 for chunk_name in $(cat $CHUNKS_PATH)
 do
   echo "$(rand_int32)" > tmp/rand-chunk${chunk_name}.txt
@@ -36,7 +29,3 @@ parallel --max-procs $CORES Rscript scripts/ppm_process_SS.R :::: $CHUNKS_PATH
 
 cd outbox
 touch 4-ppm-*
-alias tarc='tar --create --use-compress-program="pigz -3" --remove-files'
-tarc -f pack-4-ppm-2-reference.tar.gz 4-ppm-2-reference-*
-tarc -f pack-4-ppm-5-product.tar.gz 4-ppm-5-product-*
-tarc -f pack-4-ppm-6-summation.tar.gz 4-ppm-6-summation-*
