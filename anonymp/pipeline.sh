@@ -26,7 +26,9 @@ dispatch () {
   for dest in $2
   do
     mkdir -p $basedir/$dest/inbox/
-    mv --verbose $basedir/$1/outbox/pack-$1-$dest.tar.gz $basedir/$dest/inbox/
+    for file in $(find "$basedir/$1/outbox/" -name "$1-$dest-*");
+      mv --verbose $file $basedir/$dest/inbox/
+    done
   done
 }
 
