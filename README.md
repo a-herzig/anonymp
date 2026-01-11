@@ -3,7 +3,7 @@
 install the parallel computation utilities pigz and GNU parallel
 
 ``` bash
-apt install pigz parallel
+apt install parallel
 ```
 
 install the required R packages
