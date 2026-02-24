@@ -141,7 +141,7 @@ x2<-lcj$tmatc[j-1,2]+abar
 alphaM[,j]<-sapply(1:K,function(i) logSumExp(c(x1[i],x2[i])))+emit[mh1[j,]+1]
 alphaM[,j]<-alphaM[,j]-logSumExp(alphaM[,j])
 
-b1 <- emit[mh1[N-j+1,]+1] + betaM[,N-j+2]
+b1 <- emit[mh1[N-j+2,]+1] + betaM[,N-j+2]
 bbar<-sapply(1:K,function(i) logSumExp(b1[-i]))
 x1<-lcj$tmatc[j-1,1]+b1
 x2<-lcj$tmatc[j-1,2]+bbar
