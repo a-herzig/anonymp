@@ -28,7 +28,7 @@ dispatch () {
     mkdir -p $basedir/$dest/inbox/
     for file in $(find "$basedir/$1/outbox/" -name "$1-$dest-*");
     do
-      mv --verbose $file $basedir/$dest/inbox/
+      mv $file $basedir/$dest/inbox/
     done
   done
 }
