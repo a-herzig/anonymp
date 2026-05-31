@@ -36,12 +36,19 @@ run the automated pipeline on the first 16 individuals using 8 CPUs
 
 ``` bash
 cd anonymp
-./pipeline.sh 8 "$(seq 16)"
+./pipeline.sh -c 8 -t "$(seq 16)"
 ```
 
 run the automated pipeline on the first 16 individuals using 8 CPUs in the SecureSummation mode
 
 ``` bash
 cd anonymp
-./pipeline.sh 8 "$(seq 16)" SecureSummation
+./pipeline.sh -c 8 -t "$(seq 16)" -s
+```
+
+run the automated pipeline on the first 4 individuals using 8 CPUs with encrypted message transfers
+
+``` bash
+cd anonymp
+./pipelinesh -c 8 -t "$(seq 4)" -m
 ```
