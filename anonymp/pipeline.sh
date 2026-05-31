@@ -1,16 +1,16 @@
-#!/usr/bin/bash
+#!/usr/bin/dash
 
 CORES=1
 TARGETS=1
 SECURE_SUMMATION=false
 ENCRYPTED_MESSAGES=false
 
-while getopts "ctsm" opt; do
+while getopts "c:t:sm" opt; do
     case $opt in
-	c) CORES="$OPTARG";;
-	t) TARGETS="$OPTARG";;
-	s) SECURE_SUMMATION=true;;
-	m) ENCRYPTED_MESSAGES=true;;
+	c) CORES="$OPTARG" ;;
+	t) TARGETS="$OPTARG" ;;
+	s) SECURE_SUMMATION=true ;;
+	m) ENCRYPTED_MESSAGES=true ;;
     esac
 done
 
@@ -23,7 +23,7 @@ step_total_duration_file="${prefix}duration_step_total.txt"
 runstep () {
   echo process $1
   start=$(date +%s.%N)
-  $2 $cores "$3"
+  $2 "$CORES" "$3" "$ENCRYPTED_MESSAGES" "$SECURE_SUMMATION"
   duration=$(echo "$(date +%s.%N) - $start" | bc)
   echo "$1 $duration" >> $step_total_duration_file
 }
@@ -43,62 +43,62 @@ dispatch () {
 
 ACTOR="1-user"
 cd $basedir/$ACTOR
-if [ "$SECURE_SUMMATION" ]; then
-    # runstep user_init ./scripts/user_process_init_SS.sh "$targets"
-    # dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm 5-product 6-summation"
+if [ "$SECURE_SUMMATION" = true ]; then
+    runstep user_init ./scripts/user_process_init_SS.sh "$TARGETS"
+    dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm 5-product 6-summation"
 else
-    # runstep user_init ./scripts/user_process_init.sh "$targets"
-    # dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm 5-product"
+    runstep user_init ./scripts/user_process_init.sh "$TARGETS"
+    dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm 5-product"
 fi
 
 ACTOR="2-reference"
 cd $basedir/$ACTOR
-# runstep reference_init ./scripts/reference_process_init.sh
-# dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm"
+runstep reference_init ./scripts/reference_process_init.sh
+dispatch $ACTOR "1-user 2-reference 3-compare 4-ppm"
 
 ACTOR="3-compare"
 cd $basedir/$ACTOR
-# runstep compare ./scripts/compare_process.sh
-# dispatch $ACTOR "4-ppm"
+runstep compare ./scripts/compare_process.sh
+dispatch $ACTOR "4-ppm"
 
 ACTOR="4-ppm"
 cd $basedir/$ACTOR
-if [ "$SECURE_SUMMATION" ]; then
-    # runstep ppm ./scripts/ppm_process_SS.sh
-    # dispatch $ACTOR "6-summation 2-reference 5-product"
+if [ "$SECURE_SUMMATION" = true ]; then
+    runstep ppm ./scripts/ppm_process_SS.sh
+    dispatch $ACTOR "6-summation 2-reference 5-product"
 else
-    # runstep ppm ./scripts/ppm_process.sh
-    # dispatch $ACTOR "1-user 2-reference 5-product"
+    runstep ppm ./scripts/ppm_process.sh
+    dispatch $ACTOR "1-user 2-reference 5-product"
 fi
 
 ACTOR="2-reference"
 cd $basedir/$ACTOR
-# runstep reference_final ./scripts/reference_process_final.sh
-# dispatch $ACTOR "1-user 5-product"
+runstep reference_final ./scripts/reference_process_final.sh
+dispatch $ACTOR "1-user 5-product"
 
 ACTOR="5-product"
 cd $basedir/$ACTOR
-if [ "$SECURE_SUMMATION" ]; then
-    # runstep product ./scripts/product_process_SS.sh
-    # dispatch $ACTOR "6-summation"
+if [ "$SECURE_SUMMATION" = true ]; then
+    runstep product ./scripts/product_process_SS.sh
+    dispatch $ACTOR "6-summation"
 else
-    # runstep product ./scripts/product_process.sh
-    # dispatch $ACTOR "1-user"
+    runstep product ./scripts/product_process.sh
+    dispatch $ACTOR "1-user"
 fi
 
-if [ "$SECURE_SUMMATION" ]; then
+if [ "$SECURE_SUMMATION" = true ]; then
     ACTOR="6-summation"
     cd $basedir/$ACTOR
-    # runstep summation ./scripts/summation_process.sh
-    # dispatch $ACTOR "1-user"
+    runstep summation ./scripts/summation_process.sh
+    dispatch $ACTOR "1-user"
 fi
 
 ACTOR="1-user"
 cd $basedir/$ACTOR
-if [ "$SECURE_SUMMATION" ]; then
-    # runstep user_final ./scripts/user_process_final_SS.sh
+if [ "$SECURE_SUMMATION" = true ]; then
+    runstep user_final ./scripts/user_process_final_SS.sh
 else
-    # runstep user_final ./scripts/user_process_final.sh
+    runstep user_final ./scripts/user_process_final.sh
 fi
 
 cd $basedir
