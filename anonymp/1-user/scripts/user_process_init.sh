@@ -5,6 +5,9 @@
 # must be executed from parent directory `/usr/bin/dash scripts/user_process_init.sh`
 CORES="$1"
 targets="$2"
+ENCRYPTED_MESSAGES="$3"
+SECURE_SUMMATION="$4"
+
 chunks=$(gawk '{print $1}' res/coordinates.I51.2_15.txt)
 
 mkdir -p tmp outbox

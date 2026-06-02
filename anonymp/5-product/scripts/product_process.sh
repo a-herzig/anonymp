@@ -3,6 +3,8 @@
 # must be executed from parent directory `/usr/bin/dash scripts/product_process.sh`
 
 CORES="$1"
+ENCRYPTED_MESSAGES="$3"
+SECURE_SUMMATION="$4"
 
 mkdir -p outbox tmp
 

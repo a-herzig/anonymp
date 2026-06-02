@@ -4,6 +4,7 @@
 # must be executed from parent directory `/usr/bin/dash scripts/reference_process_init.sh`
 
 CORES="$1"
+ENCRYPTED_MESSAGES="$3"
 
 mkdir -p outbox tmp
 
