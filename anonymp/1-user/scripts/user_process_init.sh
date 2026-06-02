@@ -1,4 +1,4 @@
-#!/usr/bin/dash
+#!/usr/bin/bash
 # First script of imputation process
 # share an encoded genotype to compare server
 # share encode keys to reference server
@@ -37,5 +37,28 @@ then
 fi
 
 parallel --max-procs $CORES --colsep ' ' Rscript scripts/user_process_init.R :::: tmp/chunks.txt
+
+if [ "$ENCRYPTED_MESSAGES" = true ] ; then
+    USER_REFERENCE_PWD="user_reference"
+    USER_COMPARE_PWD="user_compare"
+    USER_PPM_PWD="user_ppm"
+    USER_PRODUCT_PWD="user_product"
+
+    USER_REFERENCE_PREFIX="1-user-2-reference"
+    USER_COMPARE_PREFIX="1-user-3-compare"
+    USER_PPM_PREFIX="1-user-4-ppm"
+    USER_PRODUCT_PREFIX="1-user-5-product"
+
+    for dest in USER_REFERENCE USER_COMPARE USER_PPM USER_PRODUCT
+    do
+	pwd_var=${dest}_PWD
+	prefix_var=${dest}_PREFIX
+	for file in $(find outbox -name "${!prefix_var}*")
+	do
+	    cat $file | openssl enc -aes128 -pbkdf2 -a -e -k "${!pwd_var}" > "${file}.aes128"
+	    rm $file
+	done
+    done
+fi
 
 touch outbox/1-user-*
