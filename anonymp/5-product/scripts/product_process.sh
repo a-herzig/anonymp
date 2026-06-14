@@ -19,6 +19,8 @@ if [ "$ENCRYPTED_MESSAGES" = true ] ; then
 
     for dest in USER_PRODUCT REFERENCE_PRODUCT PPM_PRODUCT
     do
+	pwd_var=${dest}_PWD
+	prefix_var=${dest}_PREFIX
 	for file in $(find inbox -name "${!prefix_var}*.aes128")
 	do
 	    cat $file | openssl enc -aes128 -pbkdf2 -a -d -k "${!pwd_var}" > "${file%.aes128}"
